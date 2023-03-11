@@ -1,41 +1,26 @@
-var express = require('express');
-var http = require('http');
-var fs = require('fs');
+const bodyparser = require('body-parser')
+const express = require("express")
+const path = require('path')
+const app = express()
 
-var app = express();
-var server = http.createServer(app);
+var PORT = process.env.port || 4000
 
-app.get('/', function (req, res) {
-  res.send('<h1>Express works..</h1>');
+app.set("views", path.join(__dirname))
+app.set("view engine", "ejs")
+
+app.use(bodyparser.urlencoded({extended:false}))
+app.use(bodyparser.json())
+
+app.get("/", function(req, res){
+  res.render("sampleForm")
 });
 
-app.get('/tasks', function(req, res) {
-  fs.readFile('./db.json', function(err, data) {
-    var tasks = JSON.parse(data.toString()).tasks;
-    res.json(tasks);
-  });
-});
+app.post('/saveData', (req, res) => {
+  console.log("Using Body-parser: ", req.body.fullname)
+  console.log("Using Body-parser: ", req.body.email)
+})
 
-server.listen(3000, function () {
-  console.log('server listening to post 3000');
-});
-
-
-
-// var http = require ('http');
-// var events = require('events');
-
-// var eventEmitter = new events.EventEmitter();
-
-// var server = http.createServer(function(req, res) {
-//   eventEmitter.emit('someone requested', 'Test') // event Emit  {ante Trigger}
-//   res.end('server works !!!');
-// });
-
-// eventEmitter.on('someone requested', function(data) {
-//   console.log('A request has been done on the server!', data);
-// }); // event listerner
-
-// server.listen(3000, 'localhost', function () {
-//   console.log('server started on port : 3000');
-// });
+app.listen(PORT, function(error){
+  if (error) throw error
+  console.log("server created successfully on PORT", PORT)
+})
